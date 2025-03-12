@@ -1,5 +1,3 @@
-//In this repository i have created a game where we select cards and match a pair of them until we find it in other ones. A good memory based game
-
 "use client"
 
 import { useState } from "react"
@@ -16,6 +14,15 @@ type MemoryCard = {
   color: string
 }
 
+const shuffleCards = (cards: MemoryCard[]) => {
+  let shuffled = [...cards];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
 const createCards = () => {
   const iconConfigs = [
     { icon: Heart, color: "text-rose-400" },
@@ -24,19 +31,19 @@ const createCards = () => {
     { icon: Moon, color: "text-purple-400" },
     { icon: Cloud, color: "text-sky-400" },
     { icon: Flower2, color: "text-emerald-400" }
-  ]
+  ];
   
-  const cards: MemoryCard[] = []
+  const cards: MemoryCard[] = [];
 
   iconConfigs.forEach(({ icon, color }, index) => {
     cards.push(
       { id: index * 2, icon, color, isMatched: false },
       { id: index * 2 + 1, icon, color, isMatched: false }
-    )
-  })
+    );
+  });
 
-  return cards.sort(() => Math.random() - 0.5)
-}
+  return shuffleCards(cards); // Use Fisher-Yates shuffle here
+};
 
 export default function MemoryGame() {
   const [cards, setCards] = useState<MemoryCard[]>(createCards())
@@ -72,15 +79,21 @@ export default function MemoryGame() {
               : card
           ))
           setFlippedIndexes([])
-          setMatches(m => m + 1)
-          setIsChecking(false)
+          setMatches(m => {
+          const newMatches = m + 1;
           
-          // Check for game completion
-          if (matches === (cards.length / 2) - 1) {
+          // Check for game completion using newMatches
+          if (newMatches === cards.length / 2) {
             toast("🎉 Congratulations! You've found all the matches! 🎈", {
-              className: "bg-purple-900 text-purple-100 border-purple-700"
-            })
+              className: "bg-green-900 text-green-100 border-green-700"
+            });
           }
+          
+          return newMatches;
+        });
+
+        setIsChecking(false);
+
         }, 500)
       } else {
         // No match - reset after delay
@@ -93,24 +106,24 @@ export default function MemoryGame() {
   }
 
   const resetGame = () => {
-    setCards(createCards())
-    setFlippedIndexes([])
-    setMatches(0)
-    setIsChecking(false)
-  }
+    setCards(shuffleCards(createCards())); // Extra shuffle for randomness
+    setFlippedIndexes([]);
+    setMatches(0);
+    setIsChecking(false);
+  };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 space-y-8 bg-gradient-to-br from-purple-950 via-indigo-950 to-slate-950">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 space-y-8 bg-gradient-to-br from-green-950 via-green-950 to-slate-950">
       <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-300 via-pink-300 to-indigo-300 text-transparent bg-clip-text">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-green-300 via-green-300 to-indigo-300 text-transparent bg-clip-text">
           Memory Match Game
         </h1>
-        <p className="text-indigo-200">
+        <p className="text-green-200">
           Matches found: {matches} of {cards.length / 2}
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 md:gap-6 p-6 rounded-xl bg-indigo-950/50 backdrop-blur-sm">
+      <div className="grid grid-cols-3 gap-4 md:gap-6 p-6 rounded-xl bg-slate-950/50 backdrop-blur-sm">
         {cards.map((card, index) => (
           <motion.div
             key={card.id}
@@ -124,14 +137,14 @@ export default function MemoryGame() {
             <Card
               className={`relative w-24 h-24 md:w-32 md:h-32 cursor-pointer transform-style-3d transition-all duration-300 ${
                 card.isMatched
-                  ? "bg-indigo-900/50 border-indigo-400/50"
+                  ? "bg-green-900/50 border-green-400/50"
                   : flippedIndexes.includes(index)
-                  ? "bg-indigo-800/50 border-indigo-500/50"
-                  : "bg-indigo-950 border-indigo-800 hover:border-indigo-600 hover:bg-indigo-900/80"
+                  ? "bg-green-800/50 border-green-500/50"
+                  : "bg-green-950 border-green-800 hover:border-green-600 hover:bg-green-900/80"
               }`}
               onClick={() => handleCardClick(index)}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-transparent via-indigo-500/5 to-white/5" />
+              <div className="absolute inset-0 bg-gradient-to-br from-transparent via-green-500/5 to-white/5" />
               <AnimatePresence>
                 {(card.isMatched || flippedIndexes.includes(index)) && (
                   <motion.div
@@ -159,7 +172,7 @@ export default function MemoryGame() {
         onClick={resetGame} 
         variant="outline" 
         size="lg"
-        className="bg-indigo-950 border-indigo-700 hover:bg-indigo-900 hover:border-indigo-500 text-indigo-200 hover:text-indigo-100"
+        className="bg-green-950 border-green-700 hover:bg-green-900 hover:border-green-500 text-green-200 hover:text-green-100"
       >
         Start New Game
       </Button>
