@@ -1,4 +1,4 @@
-# Memory Match Game
+# 🃏 Memory Match Game
 
 A fun and interactive **memory-based card matching game** built with **Typescript, React and Framer Motion**.
 
